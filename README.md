@@ -23,6 +23,28 @@
 
 ---
 
+### 📸 Ekran Görüntüleri
+
+Projenin yaşayan atmosferinden kareler:
+
+<div align="center">
+
+| **Ana Ekran (Şehir Listesi)** |
+|:---:|
+| <img src="screenshots/home-preview.jpg" alt="Diorama Ana Ekran" width="100%" style="border-radius: 10px;" /> |
+| *Yatay sürüklenebilir, dinamik şehir kartları* |
+
+<br/>
+
+| **Detay Görünümü** |
+|:---:|
+| <img src="screenshots/detail-preview.jpg" alt="Diorama Detay Ekranı" width="100%" style="border-radius: 10px;" /> |
+| *Seçilen şehrin atmosferine uygun detaylı görünüm* |
+
+</div>
+
+---
+
 ### 🌸 Proje Hakkında
 
 **Diorama**, geleneksel hava durumu uygulamalarının sıkıcı tablolarından uzaklaşarak, kullanıcıya görsel bir deneyim sunmayı hedefler. Tek bir HTML dosyası üzerinde çalışan bu modern web uygulaması, herhangi bir derleme (build) işlemine gerek duymadan tarayıcı üzerinde React gücüyle çalışır.
@@ -47,18 +69,12 @@ Bu proje, kurulum karmaşasını ortadan kaldırmak için **Standalone** yapıda
 * **Styling:** Tailwind CSS (Script tabanlı entegrasyon)
 * **Data:** Open-Meteo Free API
 
-### 📸 Ekran Görüntüleri
-
-| Ana Ekran (Liste) | Detay Görünümü |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/400x250?text=Sehir+Listesi" alt="Home View" width="100%" /> | <img src="https://via.placeholder.com/400x250?text=Detay+Ekrani" alt="Detail View" width="100%" /> |
-| *Yatay sürüklenebilir şehir kartları* | *Seçilen şehrin detaylı görünümü* |
-
 ### 📂 Proje Yapısı
 
 ```bash
 Diorama/
 ├── 📄 index.html          # Tüm React mantığı, stil ve HTML yapısı (Single File)
+├── 📁 screenshots/        # README ekran görüntüleri
 ├── 📁 images/             # Görsel varlıklar
 │   ├── 🖼️ logo.webp       # Uygulama ikonu
 │   └── 🖼️ NanoWeather-*.webp  # Şehir/Durum bazlı diorama görselleri
