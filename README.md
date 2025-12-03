@@ -27,10 +27,21 @@
 
 Projenin **Responsive** yapısı sayesinde ister bilgisayarınızda geniş ekran, ister telefonunuzda dikey formatta kusursuz bir deneyim yaşarsınız.
 
-| 🖥️ Masaüstü Deneyimi | 📱 Mobil Deneyimi |
-| :--- | :---: |
-| <img src="screenshots/desktop.jpg" alt="Diorama Desktop" width="100%" style="border-radius: 8px;" /> | <img src="screenshots/mobile.jpg" alt="Diorama Mobile" width="100%" style="border-radius: 12px;" /> |
-| *Geniş ekranda yatay kaydırma ve detaylar* | *Tek elle kullanıma uygun dikey tasarım* |
+#### 🖥️ Masaüstü Deneyimi
+
+| Şehir Listesi | Detay Görünümü |
+| :---: | :---: |
+| <img src="screenshots/desktop.jpg" alt="Masaüstü Liste" width="100%" style="border-radius: 8px;" /> | <img src="screenshots/desktop-details-preview.jpg" alt="Masaüstü Detay" width="100%" style="border-radius: 8px;" /> |
+| *Yatay sürüklenebilir şehir kartları* | *Seçilen şehrin geniş detay ekranı* |
+
+<br/>
+
+#### 📱 Mobil Deneyimi
+
+| Şehir Listesi | Detay Görünümü |
+| :---: | :---: |
+| <img src="screenshots/mobile.jpg" alt="Mobil Liste" width="100%" style="border-radius: 12px;" /> | <img src="screenshots/phone-details-preview.jpg" alt="Mobil Detay" width="100%" style="border-radius: 12px;" /> |
+| *Tek elle kullanıma uygun arayüz* | *Dikey formatta optimize edilmiş görünüm* |
 
 ---
 
@@ -64,8 +75,10 @@ Bu proje, kurulum karmaşasını ortadan kaldırmak için **Standalone** yapıda
 Diorama/
 ├── 📄 index.html          # Tüm React mantığı, stil ve HTML yapısı (Single File)
 ├── 📁 screenshots/        # README tanıtım görselleri
-│   ├── 🖼️ desktop.jpg     # Masaüstü ekran görüntüsü
-│   └── 🖼️ mobile.jpg      # Mobil ekran görüntüsü
+│   ├── 🖼️ desktop.jpg
+│   ├── 🖼️ desktop-details-preview.jpg
+│   ├── 🖼️ mobile.jpg
+│   └── 🖼️ phone-details-preview.jpg
 ├── 📁 images/             # Uygulama varlıkları
 │   ├── 🖼️ logo.webp       # Uygulama ikonu
 │   └── 🖼️ NanoWeather-*.webp  # Şehir/Durum bazlı diorama görselleri
