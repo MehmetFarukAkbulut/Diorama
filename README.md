@@ -25,23 +25,12 @@
 
 ### 📸 Ekran Görüntüleri
 
-Projenin yaşayan atmosferinden kareler:
+Projenin **Responsive** yapısı sayesinde ister bilgisayarınızda geniş ekran, ister telefonunuzda dikey formatta kusursuz bir deneyim yaşarsınız.
 
-<div align="center">
-
-| **Ana Ekran (Şehir Listesi)** |
-|:---:|
-| <img src="screenshots/home-preview.jpg" alt="Diorama Ana Ekran" width="100%" style="border-radius: 10px;" /> |
-| *Yatay sürüklenebilir, dinamik şehir kartları* |
-
-<br/>
-
-| **Detay Görünümü** |
-|:---:|
-| <img src="screenshots/detail-preview.jpg" alt="Diorama Detay Ekranı" width="100%" style="border-radius: 10px;" /> |
-| *Seçilen şehrin atmosferine uygun detaylı görünüm* |
-
-</div>
+| 🖥️ Masaüstü Deneyimi | 📱 Mobil Deneyimi |
+| :--- | :---: |
+| <img src="screenshots/desktop.jpg" alt="Diorama Desktop" width="100%" style="border-radius: 8px;" /> | <img src="screenshots/mobile.jpg" alt="Diorama Mobile" width="100%" style="border-radius: 12px;" /> |
+| *Geniş ekranda yatay kaydırma ve detaylar* | *Tek elle kullanıma uygun dikey tasarım* |
 
 ---
 
@@ -74,8 +63,10 @@ Bu proje, kurulum karmaşasını ortadan kaldırmak için **Standalone** yapıda
 ```bash
 Diorama/
 ├── 📄 index.html          # Tüm React mantığı, stil ve HTML yapısı (Single File)
-├── 📁 screenshots/        # README ekran görüntüleri
-├── 📁 images/             # Görsel varlıklar
+├── 📁 screenshots/        # README tanıtım görselleri
+│   ├── 🖼️ desktop.jpg     # Masaüstü ekran görüntüsü
+│   └── 🖼️ mobile.jpg      # Mobil ekran görüntüsü
+├── 📁 images/             # Uygulama varlıkları
 │   ├── 🖼️ logo.webp       # Uygulama ikonu
 │   └── 🖼️ NanoWeather-*.webp  # Şehir/Durum bazlı diorama görselleri
 └── 📄 README.md           # Dokümantasyon
