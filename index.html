@@ -1,0 +1,556 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diorama</title>
+  <link rel="icon" type="image/webp" href="images/logo.webp">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b1221;
+      --panel: #101a30;
+      --accent: #7c3aed;
+      --accent2: #22d3ee;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    body { background: #eef2f6; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a6a6a6; }
+    @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes floatY { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
+    @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(124,58,237,0.3);} 70% { box-shadow: 0 0 0 16px rgba(124,58,237,0);} 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0);} }
+    .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); }
+    .hero-gradient { background: radial-gradient(circle at 20% 30%, rgba(124,58,237,0.12), transparent 30%), radial-gradient(circle at 80% 20%, rgba(34,211,238,0.12), transparent 28%), linear-gradient(135deg, #f4f6fb, #e8efff); }
+    .card-shadow { box-shadow: 0 10px 30px rgba(15,23,42,0.18); }
+    .about-bg { background: radial-gradient(circle at 20% 20%, rgba(34,211,238,0.08), transparent 30%), linear-gradient(135deg, #0b1221, #0f172a); background-size: 200% 200%; animation: gradientShift 12s ease infinite; }
+    .fade-in { animation: fadeInUp 0.4s ease; }
+    .no-select { user-select: none; }
+  </style>
+</head>
+<body class="text-slate-900">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const RAW_PROVINCES = [
+      {"name":"Adana","lat":36.98615,"lon":35.32531},
+      {"name":"Adiyaman","lat":37.73139,"lon":38.46889},
+      {"name":"Afyonkarahisar","lat":38.75667,"lon":30.54333},
+      {"name":"Agri","lat":39.7191,"lon":43.0519},
+      {"name":"Amasya","lat":40.65333,"lon":35.83306},
+      {"name":"Ankara","lat":39.91987,"lon":32.85427},
+      {"name":"Antalya","lat":36.90812,"lon":30.69556},
+      {"name":"Artvin","lat":41.18161,"lon":41.82172},
+      {"name":"Aydin","lat":37.84501,"lon":27.83963},
+      {"name":"Balikesir","lat":39.61926,"lon":27.92596},
+      {"name":"Bilecik","lat":40.14192,"lon":29.97932},
+      {"name":"Bingol","lat":38.88472,"lon":40.49389},
+      {"name":"Bitlis","lat":38.40115,"lon":42.10784},
+      {"name":"Bolu","lat":40.73583,"lon":31.60611},
+      {"name":"Burdur","lat":37.72028,"lon":30.29083},
+      {"name":"Bursa","lat":40.19559,"lon":29.06013},
+      {"name":"Canakkale","lat":40.15552,"lon":26.41271},
+      {"name":"Cankiri","lat":40.6013,"lon":33.6134},
+      {"name":"Corum","lat":40.54889,"lon":34.95333},
+      {"name":"Denizli","lat":37.77417,"lon":29.0875},
+      {"name":"Diyarbakir","lat":38.01222,"lon":39.95472},
+      {"name":"Edirne","lat":41.67719,"lon":26.55597},
+      {"name":"Elazig","lat":38.68097,"lon":39.2264},
+      {"name":"Erzincan","lat":39.73919,"lon":39.49015},
+      {"name":"Erzurum","lat":39.90861,"lon":41.27694},
+      {"name":"Eskisehir","lat":39.77667,"lon":30.52056},
+      {"name":"Gaziantep","lat":37.05944,"lon":37.3825},
+      {"name":"Giresun","lat":40.91698,"lon":38.38741},
+      {"name":"Gumushane","lat":40.46001,"lon":39.47176},
+      {"name":"Hakkari","lat":37.57444,"lon":43.74083},
+      {"name":"Hatay","lat":36.4018,"lon":36.3498},
+      {"name":"Isparta","lat":37.76444,"lon":30.55222},
+      {"name":"Mersin","lat":36.81196,"lon":34.63886},
+      {"name":"Istanbul","lat":41.01384,"lon":28.94966},
+      {"name":"Izmir","lat":38.41273,"lon":27.13838},
+      {"name":"Kars","lat":40.59825,"lon":43.08548},
+      {"name":"Kastamonu","lat":41.37805,"lon":33.77528},
+      {"name":"Kayseri","lat":38.73222,"lon":35.48528},
+      {"name":"Kirklareli","lat":41.7339,"lon":27.2252},
+      {"name":"Kirsehir","lat":39.147,"lon":34.1687},
+      {"name":"Kocaeli","lat":40.74012,"lon":30.00556},
+      {"name":"Konya","lat":37.87135,"lon":32.48464},
+      {"name":"Kutahya","lat":39.42417,"lon":29.98333},
+      {"name":"Malatya","lat":38.35018,"lon":38.31667},
+      {"name":"Manisa","lat":38.61202,"lon":27.42647},
+      {"name":"Kahramanmaras","lat":37.5847,"lon":36.92641},
+      {"name":"Mardin","lat":37.31309,"lon":40.74357},
+      {"name":"Mugla","lat":37.21807,"lon":28.3665},
+      {"name":"Mus","lat":38.73163,"lon":41.48482},
+      {"name":"Nevsehir","lat":38.625,"lon":34.71222},
+      {"name":"Nigde","lat":37.96583,"lon":34.67935},
+      {"name":"Ordu","lat":40.97782,"lon":37.89047},
+      {"name":"Rize","lat":41.02083,"lon":40.52194},
+      {"name":"Sakarya","lat":40.7569,"lon":30.3781},
+      {"name":"Samsun","lat":41.27976,"lon":36.3361},
+      {"name":"Siirt","lat":37.9293,"lon":41.94134},
+      {"name":"Sinop","lat":42.02683,"lon":35.16253},
+      {"name":"Sivas","lat":39.74833,"lon":37.01611},
+      {"name":"Tekirdag","lat":40.9781,"lon":27.51101},
+      {"name":"Tokat","lat":40.31389,"lon":36.55444},
+      {"name":"Trabzon","lat":41.005,"lon":39.72694},
+      {"name":"Tunceli","lat":39.09921,"lon":39.54351},
+      {"name":"Sanliurfa","lat":37.16708,"lon":38.79392},
+      {"name":"Usak","lat":38.67351,"lon":29.4058},
+      {"name":"Van","lat":38.49457,"lon":43.38323},
+      {"name":"Yozgat","lat":39.82,"lon":34.80444},
+      {"name":"Zonguldak","lat":41.45139,"lon":31.79305},
+      {"name":"Aksaray","lat":38.37255,"lon":34.02537},
+      {"name":"Bayburt","lat":40.25631,"lon":40.22289},
+      {"name":"Karaman","lat":37.18111,"lon":33.215},
+      {"name":"Kirikkale","lat":39.8468,"lon":33.5153},
+      {"name":"Batman","lat":37.88738,"lon":41.13221},
+      {"name":"Sirnak","lat":37.51639,"lon":42.46861},
+      {"name":"Bartin","lat":41.5811,"lon":32.461},
+      {"name":"Ardahan","lat":41.10871,"lon":42.70222},
+      {"name":"Igdir","lat":39.9179,"lon":44.0411},
+      {"name":"Yalova","lat":40.65501,"lon":29.27693},
+      {"name":"Karabuk","lat":41.20488,"lon":32.62768},
+      {"name":"Kilis","lat":36.71611,"lon":37.115},
+      {"name":"Osmaniye","lat":37.07417,"lon":36.24778},
+      {"name":"Duzce","lat":40.83889,"lon":31.16389}
+    ];
+
+    const DISPLAY_NAME = {
+      "Adiyaman":"Adıyaman",
+      "Agri":"Ağrı",
+      "Aydin":"Aydın",
+      "Balikesir":"Balıkesir",
+      "Bingol":"Bingöl",
+      "Canakkale":"Çanakkale",
+      "Cankiri":"Çankırı",
+      "Corum":"Çorum",
+      "Diyarbakir":"Diyarbakır",
+      "Elazig":"Elazığ",
+      "Eskisehir":"Eskişehir",
+      "Gumushane":"Gümüşhane",
+      "Istanbul":"İstanbul",
+      "Izmir":"İzmir",
+      "Kirklareli":"Kırklareli",
+      "Kirsehir":"Kırşehir",
+      "Kutahya":"Kütahya",
+      "Kahramanmaras":"Kahramanmaraş",
+      "Mugla":"Muğla",
+      "Mus":"Muş",
+      "Nevsehir":"Nevşehir",
+      "Nigde":"Niğde",
+      "Tekirdag":"Tekirdağ",
+      "Sanliurfa":"Şanlıurfa",
+      "Usak":"Uşak",
+      "Kirikkale":"Kırıkkale",
+      "Igdir":"Iğdır",
+      "Karabuk":"Karabük",
+      "Sirnak":"Şırnak",
+      "Bartin":"Bartın",
+      "Duzce":"Düzce"
+    };
+
+    const FILE_KEYS = {
+      "Adıyaman": "Adıyaman",
+      "Ağrı": "Ağrı",
+      "Aydın": "Aydın",
+      "Balıkesir": "Balıkesir",
+      "Bingöl": "Bingöl",
+      "Çanakkale": "Çanakkale",
+      "Çankırı": "Çankırı",
+      "Çorum": "Çorum",
+      "Diyarbakır": "Diyarbakır",
+      "Elazığ": "Elazığ",
+      "Eskişehir": "Eskişehir",
+      "Gümüşhane": "Gümüşhane",
+      "İstanbul": "İstanbul",
+      "İzmir": "İzmir",
+      "Kırklareli": "Kırklareli",
+      "Kırşehir": "Kırşehir",
+      "Kütahya": "Kütahya",
+      "Kahramanmaraş": "Kahramanmaraş",
+      "Muğla": "Muğla",
+      "Muş": "Muş",
+      "Nevşehir": "Nevşehir",
+      "Niğde": "Niğde",
+      "Tekirdağ": "Tekirdağ",
+      "Şanlıurfa": "Şanlıurfa",
+      "Uşak": "Uşak",
+      "Kırıkkale": "Kırıkkale",
+      "Iğdır": "Iğdır",
+      "Karabük": "Karabük",
+      "Şırnak": "Şırnak",
+      "Bartın": "Bartın",
+      "Düzce": "Düzce"
+    };
+
+    const SHORT_NAME = { "Afyonkarahisar": "Afyon", "Kahramanmaraş": "Maraş" };
+    const CONDITION_LABELS = { Sunny: "Güneşli", Cloudy: "Bulutlu", Rainy: "Yağmurlu", Snowy: "Karlı", Foggy: "Sisli" };
+    const POPULAR_CITIES = ["İstanbul", "Ankara", "İzmir", "Antalya", "Bursa", "Trabzon", "Konya", "Adana", "Nevşehir", "Gaziantep"];
+    const PROVINCES = RAW_PROVINCES.map(p => ({ ...p, name: DISPLAY_NAME[p.name] || p.name }));
+    const dailyParams = "weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max";
+
+    const conditionFromCode = (code) => {
+      if ([0, 1].includes(code)) return { key: "Sunny", label: CONDITION_LABELS.Sunny };
+      if (code === 2 || code === 3) return { key: "Cloudy", label: CONDITION_LABELS.Cloudy };
+      if ([45, 48].includes(code)) return { key: "Foggy", label: CONDITION_LABELS.Foggy };
+      if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(code)) return { key: "Rainy", label: CONDITION_LABELS.Rainy };
+      if ([71, 73, 75, 77, 85, 86].includes(code)) return { key: "Snowy", label: CONDITION_LABELS.Snowy };
+      return { key: "Cloudy", label: CONDITION_LABELS.Cloudy };
+    };
+
+    const formatDateTR = (iso) => {
+      const d = new Date(iso);
+      return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" });
+    };
+
+    const imageForCity = (city, conditionKey) => {
+      const key = FILE_KEYS[city] || city;
+      return `images/NanoWeather-${key}-${conditionKey}.webp`;
+    };
+
+    const AppHeader = ({ onBack, canGoBack, onAbout, view }) => (
+      <div className="flex items-center justify-between px-4 sm:px-8 py-3 bg-white/90 shadow-sm backdrop-blur sticky top-0 z-30">
+        <div className="flex items-center gap-3">
+          {canGoBack ? (
+            <button onClick={onBack} className="p-2 rounded-full hover:bg-slate-100 transition text-slate-700" aria-label="Geri">
+              <span className="text-xl">←</span>
+            </button>
+          ) : (
+            <div className="w-10" />
+          )}
+          <div className="flex items-center gap-3">
+            <img src="images/logo.webp" alt="Diorama Logo" className="w-10 h-10 rounded-full shadow-sm ring-1 ring-slate-200" />
+            <div className="leading-tight">
+              <div className="text-xl font-bold text-slate-900">Diorama</div>
+              <div className="text-xs text-slate-500">81 il • günlük tahmin</div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => onAbout(view === "about" ? "home" : "about")} className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+            {view === "about" ? "Uygulamaya dön" : "Hakkında"}
+          </button>
+        </div>
+      </div>
+    );
+
+    const CityCard = ({ city, data, onClick }) => {
+      const name = SHORT_NAME[city.name] || city.name;
+      const condition = data ? conditionFromCode(data.weathercode) : { key: "Cloudy", label: "Yükleniyor" };
+      const temp = data ? Math.round(data.temp) : "--";
+      const src = imageForCity(city.name, condition.key);
+      return (
+        <div className="snap-start shrink-0 w-[90vw] sm:w-72 md:w-80 max-w-[420px] cursor-pointer" onClick={onClick}>
+          <div className="relative overflow-hidden rounded-3xl card-shadow bg-slate-200 h-[62vh] min-h-[360px] flex items-end">
+            <img src={src} alt={city.name} className="absolute inset-0 w-full h-full object-cover" onError={(e)=>{e.target.onerror=null;e.target.src=imageForCity(city.name,"Sunny");}} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <div className="relative p-4 sm:p-5 text-white flex flex-col gap-1">
+              <div className="text-lg sm:text-xl font-bold tracking-wide">{name.toUpperCase()}</div>
+              <div className="text-sm sm:text-base text-slate-100">{condition.label}</div>
+              <div className="text-3xl sm:text-4xl font-extrabold drop-shadow mt-1">{temp}°C</div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const DetailView = ({ city, forecast, onBack, onAbout }) => {
+      const [dayIndex, setDayIndex] = React.useState(0);
+      const days = forecast?.days || [];
+      React.useEffect(() => { setDayIndex(0); }, [city?.name]);
+      if (!city) return null;
+      const currentDay = days[dayIndex] || {};
+      const condition = conditionFromCode(currentDay.code ?? 0);
+      const img = imageForCity(city.name, condition.key);
+      const name = SHORT_NAME[city.name] || city.name;
+
+      const changeDay = (delta) => {
+        setDayIndex((idx) => {
+          const next = idx + delta;
+          if (next < 0 || next >= days.length) return idx;
+          return next;
+        });
+      };
+
+      return (
+        <div className="flex flex-col h-screen bg-slate-100">
+          <AppHeader onBack={onBack} canGoBack={true} onAbout={onAbout} view="detail" />
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-8 pb-4">
+            <div className="relative w-full max-w-4xl">
+              <div className="relative overflow-hidden rounded-[28px] bg-slate-900 text-white shadow-2xl h-[calc(100vh-160px)] md:h-[calc(100vh-180px)] flex flex-col justify-end">
+                <img src={img} alt={city.name} className="absolute inset-0 w-full h-full object-cover" onError={(e)=>{e.target.onerror=null;e.target.src=imageForCity(city.name,"Sunny");}} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <div className="relative px-6 sm:px-10 pb-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-center">
+                    <div className="text-3xl sm:text-4xl font-extrabold drop-shadow">{name.toUpperCase()}</div>
+                  </div>
+                  <div className="text-center text-sm sm:text-base tracking-wide font-semibold text-slate-100">{currentDay.label || "Güncelleniyor"}</div>
+                  <div className="flex items-end justify-center gap-3">
+                    <div className="text-6xl sm:text-7xl font-black drop-shadow">{Math.round(currentDay.temp ?? 0)}°C</div>
+                    <div className="text-lg sm:text-xl font-semibold mb-2">{condition.label}</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 text-sm text-slate-200">
+                    <div className="rounded-2xl px-3 py-2 bg-white/10 border border-white/10 text-center backdrop-blur-sm">
+                      <div className="font-semibold">{Math.round(currentDay.wind ?? 0)} km/sa</div>
+                      <div className="text-xs text-slate-200/80">Rüzgar</div>
+                    </div>
+                    <div className="rounded-2xl px-3 py-2 bg-white/10 border border-white/10 text-center backdrop-blur-sm">
+                      <div className="font-semibold">{Math.round(currentDay.precip ?? 0)}%</div>
+                      <div className="text-xs text-slate-200/80">Yağış olasılığı</div>
+                    </div>
+                    <div className="rounded-2xl px-3 py-2 bg-white/10 border border-white/10 text-center backdrop-blur-sm">
+                      <div className="font-semibold">{Math.round(currentDay.max ?? 0)}° / {Math.round(currentDay.min ?? 0)}°</div>
+                      <div className="text-xs text-slate-200/80">Maks / Min</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 pt-2">
+                    <button onClick={()=>changeDay(-1)} className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white transition text-sm">Önceki</button>
+                    <div className="px-4 py-2 rounded-full bg-white text-slate-800 font-semibold text-sm min-w-[160px] text-center">
+                      {currentDay.label || "—"}
+                    </div>
+                    <button onClick={()=>changeDay(1)} className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white transition text-sm">Sonraki</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const AboutView = ({ onBack, onAbout }) => (
+      <div className="min-h-screen about-bg text-white">
+        <AppHeader onBack={onBack} canGoBack={true} onAbout={onAbout} view="about" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8">
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
+            <div className="relative">
+              <div className="absolute inset-0 blur-2xl bg-gradient-to-br from-purple-500/30 to-cyan-300/30 animate-[gradientShift_10s_ease_infinite]" />
+              <img src="images/logo.webp" alt="Diorama Logo" className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-full shadow-2xl ring-2 ring-white/20 animate-[floatY_4s_ease-in-out_infinite]" />
+            </div>
+            <div className="lg:flex-1 space-y-3">
+              <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">Diorama Hakkında</h2>
+              <p className="text-slate-200 leading-relaxed">Diorama, 81 ilin günlük ve çok günlük hava durumunu tek ekranda gösteren tatlı bir hava uygulaması. Renkli diorama görselleri ve tamamen Türkçe arayüzüyle hem masaüstü hem mobilde kaydırma derdi olmadan çalışır.</p>
+              <p className="text-slate-300 leading-relaxed">Open-Meteo API ile anlık ve 7 günlük tahminleri çeker, yerel Diorama görselleriyle eşleştirir. Harita ve harici görsel üretimi kaldırıldı; tüm içerik yerel ve hızlı.</p>
+              <div className="flex gap-3">
+                <span className="px-3 py-2 rounded-full bg-white/10 border border-white/10 text-sm">Mobil dostu</span>
+                <span className="px-3 py-2 rounded-full bg-white/10 border border-white/10 text-sm">Ana ekran carousel</span>
+                <span className="px-3 py-2 rounded-full bg-white/10 border border-white/10 text-sm">7 güne kadar</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-xl animate-[fadeInUp_0.6s_ease]">
+              <h3 className="text-xl font-semibold mb-2 text-white">Nasıl çalışır?</h3>
+              <p className="text-slate-200 leading-relaxed">Uygulama açıldığında 81 ilin bugünkü durumunu Open-Meteo’dan alır ve şehir kartlarını doldurur. Bir şehre dokunduğunuzda detay ekranı tam görünümde açılır; gün ileri/geri butonları kartın içinde yer alır ve görsel otomatik değişir.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-xl animate-[fadeInUp_0.6s_ease_0.1s]">
+              <h3 className="text-xl font-semibold mb-2 text-white">Tasarım</h3>
+              <p className="text-slate-200 leading-relaxed">Diorama logosu ve pastel renk paleti, about.html’deki animasyonlarla uyumlu olacak şekilde sade cam efektleri, gradientler ve yumuşak geçişler kullanıldı. İndir/büyüt kontrolleri yok; içerik tamamen odaklı.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-xl animate-[fadeInUp_0.6s_ease_0.15s] md:col-span-2">
+              <h3 className="text-xl font-semibold mb-2 text-white">Geliştirici</h3>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <img src="https://avatars.githubusercontent.com/u/78991543" alt="Mehmet Faruk Akbulut" className="w-16 h-16 rounded-full border border-white/20 shadow-lg" />
+                <div className="space-y-2">
+                  <div className="text-lg font-semibold">Mehmet Faruk Akbulut</div>
+                  <div className="text-slate-200 text-sm">Full-stack meraklısı; API, görselleştirme ve otomasyon üzerine çalışıyor. Diorama görsellerinin website entegrasyonu için bu yapıyı hazırladı.</div>
+                  <div className="flex flex-wrap gap-2 text-sm">
+                    <a className="px-3 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/15 transition" href="https://github.com/MehmetFarukAkbulut" target="_blank" rel="noreferrer">GitHub</a>
+                    <a className="px-3 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/15 transition" href="https://www.linkedin.com/in/mehmet-faruk-akbulut" target="_blank" rel="noreferrer">LinkedIn</a>
+                    <a className="px-3 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/15 transition" href="https://www.instagram.com/mfaruk_akbulut/" target="_blank" rel="noreferrer">Instagram</a>
+                    <a className="px-3 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/15 transition" href="mailto:mefarukakbulut@gmail.com">E-posta</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    const HomeView = ({ cityData, loading, onSelectCity, search, setSearch, onAbout }) => {
+      const scrollerRef = React.useRef(null);
+      const isDownRef = React.useRef(false);
+      const startXRef = React.useRef(0);
+      const scrollLeftRef = React.useRef(0);
+      const [showArrows, setShowArrows] = React.useState(false);
+
+      const onPointerDown = (e) => {
+        if (!scrollerRef.current) return;
+        isDownRef.current = true;
+        startXRef.current = e.clientX;
+        scrollLeftRef.current = scrollerRef.current.scrollLeft;
+      };
+      const onPointerMove = (e) => {
+        if (!isDownRef.current || !scrollerRef.current) return;
+        const walk = (startXRef.current - e.clientX) * 1.2;
+        scrollerRef.current.scrollLeft = scrollLeftRef.current + walk;
+      };
+      const endDrag = () => { isDownRef.current = false; };
+      const onWheel = (e) => {
+        if (!scrollerRef.current) return;
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          scrollerRef.current.scrollLeft += e.deltaY;
+          e.preventDefault();
+        }
+      };
+      const scrollBy = (delta) => {
+        if (!scrollerRef.current) return;
+        scrollerRef.current.scrollBy({ left: delta, behavior: "smooth" });
+      };
+      const filtered = PROVINCES
+        .filter(c => (c.name.toLowerCase()).includes(search.toLowerCase()))
+        .sort((a,b) => {
+          const aPop = POPULAR_CITIES.includes(a.name) ? 0 : 1;
+          const bPop = POPULAR_CITIES.includes(b.name) ? 0 : 1;
+          if (aPop !== bPop) return aPop - bPop;
+          return a.name.localeCompare(b.name, "tr");
+        });
+      return (
+        <div className="flex flex-col h-screen overflow-hidden hero-gradient">
+          <AppHeader canGoBack={false} onBack={()=>{}} onAbout={onAbout} view="home" />
+          <div className="px-4 sm:px-8 py-3 flex flex-col gap-3">
+            <div className="relative">
+              <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Şehir ara..." className="w-full rounded-2xl border border-slate-200 shadow-sm px-4 py-3 pl-11 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white" />
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+            </div>
+            <div className="text-lg font-semibold text-slate-700">Şehirler</div>
+          </div>
+          <div
+            className="flex-1 relative px-4 sm:px-6 pb-6"
+            onMouseEnter={()=>setShowArrows(true)}
+            onMouseLeave={()=>setShowArrows(false)}
+          >
+            <div
+              className="overflow-x-auto overflow-y-hidden h-full"
+              ref={scrollerRef}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerLeave={endDrag}
+              onWheel={onWheel}
+            >
+              <div className="flex gap-4 snap-x snap-mandatory no-select h-full select-none active:cursor-grabbing">
+                {filtered.map((city)=>(
+                  <CityCard key={city.name} city={city} data={cityData[city.name]} onClick={()=>onSelectCity(city)} />
+                ))}
+                {loading && filtered.length===0 && <div className="text-slate-500 p-4">Yükleniyor...</div>}
+              </div>
+            </div>
+            <div className="hidden lg:flex items-center justify-between pointer-events-none absolute inset-y-6 left-6 right-6">
+              <button
+                onClick={()=>scrollBy(-500)}
+                className={`pointer-events-auto h-12 w-12 rounded-full bg-white/80 shadow-lg ring-1 ring-slate-200 flex items-center justify-center text-slate-700 transition transform ${showArrows ? 'opacity-100' : 'opacity-0'} hover:scale-105`}
+                aria-label="Sola kaydır"
+              >
+                {"\u2190"}
+              </button>
+              <button
+                onClick={()=>scrollBy(500)}
+                className={`pointer-events-auto h-12 w-12 rounded-full bg-white/80 shadow-lg ring-1 ring-slate-200 flex items-center justify-center text-slate-700 transition transform ${showArrows ? 'opacity-100' : 'opacity-0'} hover:scale-105`}
+                aria-label="Sağa kaydır"
+              >
+                {"\u2192"}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [view, setView] = React.useState("home");
+      const [selected, setSelected] = React.useState(null);
+      const [cityData, setCityData] = React.useState({});
+      const [loading, setLoading] = React.useState(true);
+      const [search, setSearch] = React.useState("");
+
+      React.useEffect(() => {
+        let cancelled = false;
+        const fetchAll = async () => {
+          try {
+            const results = await Promise.allSettled(PROVINCES.map(async (p) => {
+              const url = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current_weather=true&daily=${dailyParams}&forecast_days=7&timezone=auto`;
+              const res = await fetch(url);
+              const data = await res.json();
+              const days = (data.daily?.time || []).map((t, idx) => ({
+                date: t,
+                label: formatDateTR(t),
+                code: data.daily.weathercode?.[idx],
+                max: data.daily.temperature_2m_max?.[idx],
+                min: data.daily.temperature_2m_min?.[idx],
+                precip: data.daily.precipitation_probability_max?.[idx],
+                wind: data.daily.windspeed_10m_max?.[idx],
+                temp: data.daily.temperature_2m_max?.[idx] ?? data.current_weather?.temperature
+              }));
+              const today = days[0] || {};
+              const display = {
+                temp: today.temp ?? today.max ?? data.current_weather?.temperature ?? 0,
+                weathercode: today.code ?? data.current_weather?.weathercode ?? 2,
+                days
+              };
+              return [p.name, display];
+            }));
+            if (cancelled) return;
+            const map = {};
+            results.forEach(r => { if (r.status === "fulfilled") { const [name, val] = r.value; map[name] = val; } });
+            setCityData(map);
+          } catch (e) {
+            console.error(e);
+          } finally {
+            if (!cancelled) setLoading(false);
+          }
+        };
+        fetchAll();
+        return () => { cancelled = true; };
+      }, []);
+
+      const handleSelectCity = (city) => {
+        setSelected(city);
+        setView("detail");
+      };
+
+      const handleBack = () => {
+        if (view === "detail") {
+          setView("home");
+          setSelected(null);
+        } else if (view === "about") {
+          setView("home");
+        }
+      };
+
+      const handleAbout = (target) => {
+        setView(target);
+      };
+
+      const detailData = selected ? cityData[selected.name] : null;
+
+      if (view === "about") return <AboutView onBack={handleBack} onAbout={()=>handleAbout("home")} />;
+      if (view === "detail") return <DetailView city={selected} forecast={{ days: detailData?.days || [] }} onBack={handleBack} onAbout={handleAbout} />;
+
+      const listData = Object.fromEntries(Object.entries(cityData).map(([k,v])=>[k,{ weathercode: v?.weathercode ?? v?.days?.[0]?.code, temp: v?.temp ?? v?.days?.[0]?.temp }]));
+
+      return (
+        <HomeView
+          cityData={listData}
+          loading={loading}
+          onSelectCity={handleSelectCity}
+          search={search}
+          setSearch={setSearch}
+          onAbout={() => handleAbout("about")}
+        />
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
